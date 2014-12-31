@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe NISTRandomnessBeacon::Client do
   before do
-    Timecop.freeze(Time.local(2014))
+    Timecop.freeze(Time.utc(2014))
   end
 
   after do
