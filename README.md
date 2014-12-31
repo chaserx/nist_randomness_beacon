@@ -1,7 +1,7 @@
 # NIST Randomness Beacon
 
 A wrapper for the NIST Randomness Beacon 'cause sometimes you need to get
-a 512-bit full-entropy bit-string programmaticlly. You never know.
+a 512-bit full-entropy bit-string programmatically. You never know.
 
 Inspiration: http://hackaday.com/2014/12/19/nist-randomness-beacon/
 
@@ -35,7 +35,8 @@ record.output_value
 # => "4838827EDEE67CD5F58139933709764D1C51B4FC362DCAAB06B1572AC533F15F648F5EA98C5276187EBB87148852AEE291DB735F821CDC04E53DD7331AB1D3B6"
 ```
 
-WARNING: DO NOT USE BEACON GENERATED VALUES AS SECRET CRYPTOGRAPHIC KEYS.
+WARNING: DO NOT USE BEACON-GENERATED VALUES AS SECRET CRYPTOGRAPHIC KEYS. See
+[this StackExchange thread](http://crypto.stackexchange.com/questions/15225/how-useful-is-nists-randomness-beacon-for-cryptographic-use).
 
 ## Contributing
 
