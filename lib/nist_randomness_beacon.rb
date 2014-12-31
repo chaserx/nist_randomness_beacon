@@ -1,0 +1,5 @@
+require 'nist_randomness_beacon/version'
+require 'nist_randomness_beacon/client'
+require 'nist_randomness_beacon/record'
+require 'nist_randomness_beacon/service_error'
+require 'nist_randomness_beacon/underscore'
