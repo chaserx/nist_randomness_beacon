@@ -1,5 +1,7 @@
 # NIST Randomness Beacon
 
+[![Build Status](https://travis-ci.org/chaserx/nist_randomness_beacon.svg)](https://travis-ci.org/chaserx/nist_randomness_beacon)
+
 A wrapper for the NIST Randomness Beacon 'cause sometimes you need to get
 a 512-bit full-entropy bit-string programmatically. You never know.
 
