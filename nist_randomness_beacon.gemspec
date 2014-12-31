@@ -9,8 +9,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Chase Southard"]
   spec.email         = ["chase.southard@gmail.com"]
   spec.summary       = %q{A wrapper for NIST Randomness Beacon}
-  spec.description   = %q{A wrapper for NIST Randomness Beacon}
-  spec.homepage      = ""
+  spec.description   = %q{A wrapper for the NIST Randomness Beacon
+                          'cause sometimes you need to get
+                          a 512-bit full-entropy bit-string programmaticlly.
+                          You never know.}
+  spec.homepage      = "https://github.com/chaserx/nist_randomness_beacon"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
