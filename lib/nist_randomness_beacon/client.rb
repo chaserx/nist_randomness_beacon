@@ -19,8 +19,7 @@ module NISTRandomnessBeacon
     #
     def current
       response = self.class.get("#@uri/#@timestamp")
-      raise ServiceError, response.body unless response.code.eql? 200
-      NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
+      create_new_record(response)
     end
 
     # Returns the Previous Record
@@ -28,8 +27,7 @@ module NISTRandomnessBeacon
     #
     def previous
       response = self.class.get("#@uri/previous/#@timestamp")
-      raise ServiceError, response.body unless response.code.eql? 200
-      NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
+      create_new_record(response)
     end
 
     # Returns the Next Record
@@ -37,8 +35,7 @@ module NISTRandomnessBeacon
     #
     def next
       response = self.class.get("#@uri/next/#@timestamp")
-      raise ServiceError, response.body unless response.code.eql? 200
-      NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
+      create_new_record(response)
     end
 
     # Returns the Last Record
@@ -46,8 +43,7 @@ module NISTRandomnessBeacon
     #
     def last
       response = self.class.get("#@uri/last")
-      raise ServiceError, response.body unless response.code.eql? 200
-      NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
+      create_new_record(response)
     end
 
     # Returns the Start Chain Record
@@ -55,7 +51,13 @@ module NISTRandomnessBeacon
     #
     def start_chain
       response = self.class.get("#@uri/start-chain/#@timestamp")
-      raise ServiceError, response.body unless response.code.eql? 200
+      create_new_record(response)
+    end
+
+    private
+
+    def create_new_record response, response_code=200
+      raise ServiceError, response.body unless response.code.eql? response_code
       NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
     end
   end
