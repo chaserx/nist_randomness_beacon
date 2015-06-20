@@ -1,6 +1,6 @@
 module NISTRandomnessBeacon
   class Record
-    attr_reader :version, :frequency, :timestamp, :seed_value,
+    attr_reader :version, :frequency, :time_stamp, :seed_value,
                 :previous_output_value, :signature_value, :output_value,
                 :status_code
 
