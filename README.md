@@ -50,6 +50,12 @@ record.output_value
 WARNING: DO NOT USE BEACON-GENERATED VALUES AS SECRET CRYPTOGRAPHIC KEYS. See
 [this StackExchange thread](http://crypto.stackexchange.com/questions/15225/how-useful-is-nists-randomness-beacon-for-cryptographic-use).
 
+## Documentation
+
+You can generate docs locally with the command `rake yard`.
+
+You can view the docs for the latest release [here](http://www.rubydoc.info/gems/nist_randomness_beacon) at RubyDoc.info
+
 ## Contributing
 
 Pull requests welcome! Please see the [contribution guide](CONTRIBUTING.md).
