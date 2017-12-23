@@ -54,7 +54,7 @@ WARNING: DO NOT USE BEACON-GENERATED VALUES AS SECRET CRYPTOGRAPHIC KEYS. See
 
 You can generate docs locally with the command `rake yard`.
 
-You can view the docs for the latest release [here](http://www.rubydoc.info/gems/nist_randomness_beacon) at RubyDoc.info
+You can [view the docs](http://www.rubydoc.info/gems/nist_randomness_beacon) for the latest release at RubyDoc.info.
 
 ## Contributing
 
