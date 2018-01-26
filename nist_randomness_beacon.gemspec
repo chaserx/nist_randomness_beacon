@@ -29,6 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.12'
   spec.add_development_dependency 'timecop', '~> 0.8'
 
-  spec.add_dependency 'httparty', '~> 0.15.6'
+  spec.add_dependency 'httparty', '~> 0.15'
   spec.add_dependency 'json', '~> 2.1'
 end
