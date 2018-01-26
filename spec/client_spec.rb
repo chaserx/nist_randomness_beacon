@@ -29,8 +29,8 @@ describe NISTRandomnessBeacon::Client do
       }
 
       it 'raises service error' do
-        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500)
-        expect{subject}.to raise_error
+        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500, body: 'stubbed response')
+        expect{subject}.to raise_error(NISTRandomnessBeacon::ServiceError, 'stubbed response')
       end
     end
   end
@@ -54,8 +54,8 @@ describe NISTRandomnessBeacon::Client do
       }
 
       it 'raises service error' do
-        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500)
-        expect{subject}.to raise_error
+        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500, body: 'stubbed response')
+        expect{subject}.to raise_error(NISTRandomnessBeacon::ServiceError, 'stubbed response')
       end
     end
   end
@@ -79,8 +79,8 @@ describe NISTRandomnessBeacon::Client do
       }
 
       it 'raises service error' do
-        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500)
-        expect{subject}.to raise_error
+        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500, body: 'stubbed response')
+        expect{subject}.to raise_error(NISTRandomnessBeacon::ServiceError, 'stubbed response')
       end
     end
   end
@@ -104,8 +104,8 @@ describe NISTRandomnessBeacon::Client do
       }
 
       it 'raises service error' do
-        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500)
-        expect{subject}.to raise_error
+        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500, body: 'stubbed response')
+        expect{subject}.to raise_error(NISTRandomnessBeacon::ServiceError, 'stubbed response')
       end
     end
   end
@@ -129,8 +129,8 @@ describe NISTRandomnessBeacon::Client do
       }
 
       it 'raises service error' do
-        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500)
-        expect{subject}.to raise_error
+        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500, body: 'stubbed response')
+        expect{subject}.to raise_error(NISTRandomnessBeacon::ServiceError, 'stubbed response')
       end
     end
   end
