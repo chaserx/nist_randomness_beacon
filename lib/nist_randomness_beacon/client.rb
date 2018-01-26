@@ -9,7 +9,7 @@ module NISTRandomnessBeacon
     include HTTParty
     attr_reader :timestamp, :uri
 
-    def initialize time=nil, uri=DEFAULT_URI
+    def initialize(time=nil, uri=DEFAULT_URI)
       @timestamp = (time || Time.now).to_i
       @uri = uri
     end
@@ -56,7 +56,7 @@ module NISTRandomnessBeacon
 
     private
 
-    def create_new_record response, response_code=200
+    def create_new_record(response, response_code=200)
       raise ServiceError, response.body unless response.code.eql? response_code
       NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
     end
