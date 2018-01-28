@@ -59,3 +59,9 @@ You can [view the docs](http://www.rubydoc.info/gems/nist_randomness_beacon) for
 ## Contributing
 
 Pull requests welcome! Please see the [contribution guide](CONTRIBUTING.md).
+
+## License 
+
+MIT License
+
+Some documents were produced and provided by NIST. 

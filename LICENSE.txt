@@ -1,4 +1,4 @@
-Copyright (c) 2014 Chase Southard
+Copyright (c) 2014 Chase Southard except where specified.
 
 MIT License
 

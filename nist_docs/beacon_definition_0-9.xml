@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema
+  xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://csrc.nist.gov/ns/beacon/pulse/1.0"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified" version="0.9.2">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="https://www.w3.org/2009/01/xml.xsd">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-US">Import general XML schema.</xs:documentation>
+    </xs:annotation>
+  </xs:import>
+
+<!--
+Proposed REST calls:
+
+Pulse at <timestamp> (or next closest AFTER the provided <timestamp>):
+    https://<server name>/<context>/beacon/1.0/pulse/<timestamp>
+Previous Pulse (the first available Pulse prior to the <timestamp>):
+    https://<server name>/<context>/beacon/1.0/pulse/previous/<timestamp>
+Next Pulse (the first available Pulse after the <timestamp>):
+    https://<server name>/<context>/beacon/1.0/pulse/next/<timestamp>
+Last Pulse (the last available pulse):
+    https://<server name>/<context>/beacon/1.0/pulse/last
+Start Chain Pulse (finds the first pulse which starts the chain this Pulse is a part of):
+    https://<server name>/<context>/beacon/1.0/pulse/start-chain/<timestamp>
+
+The prior calls all return a reponse in the form:
+   <response xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0">
+    <pulse>...</pulse>
+   </response>
+
+   or in the case of an error:
+   <response xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0">
+    <error>...</error>
+   </response>
+
+If a request for a next or previous pulse results in no pulse found, a 404 response is returned.
+
+Certificate:
+  https://<server name>/<context>/beacon/1.0/certificate/<certificate identifier>
+   - Returns a BASE 64 encoded RFC 5280 PKIX Certficate (PEM Format)
+   - non-existent certificate identifier results in a 404 reponse
+External Source Message
+  https://<server name>/<context>/beacon/1.0/external-source/<source identifier>
+   - Returns a MIME type text/plain document which is associated with the identifier
+   - the identifier is a SHA-512 Hash of this doucment
+   - non-existent source identifier results in a 404 reponse
+
+Skip List
+  https://<server name>/<context>/beacon/1.0/skip-list/<start time stamp>/<end time stamp>
+  - Returns a response in the form:
+
+  <response xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0">
+    <skipList>
+      <pulse>...</pulse>
+      <pulse type="year">...</pulse>
+      <pulse type="month">...</pulse>
+      <pulse type="day">...</pulse>
+      <pulse type="hour">...</pulse>
+      <pulse type="previous">...</pulse>
+    </skipList>
+  </response>
+
+  NOTE: there is no restriction on how many of each type and it is more likely than not that
+     there will be more than one of each type in a particular response.
+
+  Which starts with the pulse with the exact <start time stamp> and ends with the exact <end time stamp>.
+
+  A 404 will be returned if there does not exist a pulse for either the <state time stamp> or the <end time stamp>
+
+  - Returns an error response if the response exceeeds a server specified threshhold of the form:
+   <response xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0">
+    <error>...</error>
+   </response>
+
+chain:
+  https://<server name>/<context>/beacon/1.0/chain/<start time stamp>/<end time stamp>/<type>
+  - Returns a response in the form:
+
+  <response xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0">
+    <skipList>
+      <pulse>...</pulse>
+      <pulse type="<type>">...</pulse>
+      ...
+      <pulse type="<type>">...</pulse>
+    </skipList>
+  </response>
+
+  Which starts with the pulse with the exact <start time stamp> and ends with the exact <end time stamp> using
+  the interval defined by <type>.
+
+  A 404 will be returned if there does no exist a pulse for either the <state time stamp> or the <end time stamp>
+  or if the type input value is not valid.
+
+  - Returns an error response if the response exceeeds a server specified threshhold of the form:
+   <response xmlns="http://csrc.nist.gov/ns/beacon/pulse/1.0">
+    <error>...</error>
+   </response>
+-->
+
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="error" type="errorType">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-US">An error element containing information about the error</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="pulse" type="pulseType" minOccurs="1" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-US">A single pulse, or a set of pulses which are not directly connected (in other words not a chain or a skipList).</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="chain" type="chainType">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-US">A sequence of pulses with none missing (all the pulses between time T1 and T2).</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="skipList" type="chainType">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-US">A sequence of pulses that contains an intact hash chain, and showing that the pulses at time T1 and T2 are part of the same hash chain.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- the error type -->
+  <xs:complexType name="errorType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-US">A type for a beacon error response.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="code" type="xs:int">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">A short error code</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="description" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-US">Type for a locale specific error description.</xs:documentation>
+          </xs:annotation>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute ref="xml:lang" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- the pulse type -->
+  <xs:complexType name="pulseType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-US">The type for a single pulse.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="version">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The version string, e.g. “0.1.0”</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:maxLength value="32"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="frequency" type="xs:int">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The time interval, in milliseconds, between expected pulses</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="certificateId" type="sha512HexString">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The hash (i.e. SHA512 hash) of the X.509 ASN.1 encoding of the certificate containing the public key which can be used to verify this pulse.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="timeStamp" type="xs:long">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The time this pulse was released as the number of milli-seconds since January 1, 1970 UTC, not counting leap seconds (UNIX time)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="localRandomValue" type="sha512HexString">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">A local random value represented as a 64 byte (512-bit) hex string value</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="external" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">A value external to a beacon. This value should be a value outside the control of the operators
+            of the beacon which changes unpredictably over time. This value must be able to be verified by users of the beacon.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="sourceId" type="sha512HexString">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-US">The SHA-512 hash value of a description of the external source.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="statusCode" type="xs:short">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-US">The status code for retrieval of a value from the source.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="value" type="sha512HexString">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-US">A SHA-512 hash of a value as described in sourceId</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="listValue" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The SHA-512 hash value of a pulse - 64 byte hex string</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="sha512HexString">
+              <xs:attribute name="type" type="xs:token" use="required">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-US">the type of list value:
+                   previous - the previous pulse value, or 0's if no such pulse exists
+                   hour - the outputValue of the first pulse of the UTC "hour" of the previous pulse, or 0's if no such pulse exists
+                   day - the outputValue of the first pulse of the UTC "day" of the previous pulse, or 0's if no such pulse exists
+                   month - the outputValue of the first pulse of the UTC "month" of the previous pulse, or 0's if no such pulse exists
+                   year - the outputValue of the first pulse of the UTC "year" of the previous pulse, or 0's if no such pulse exists
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="precommitmentValue" type="sha512HexString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The SHA-512 hash of the next localRandomValue (a pre-commitment) as a 64 byte hex string. This value may be all '0's if not used.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="statusCode" type="xs:short">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">The status code value:
+            0 - Chain intact, values all good
+            1 - Start of a new chain of values, previous hash value will be all zeroes
+            2 - Time between values is greater than the frequency, but the chain is still intact
+            3 - Time between values is greater than the frequency, the chain is intact, but the input of the prior precommitmentValue was lost</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="signatureValue">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">A big-endian hex encoded digital signature using the public key contained in certificateId computed over (in order):
+            strlen(version)
+            version as a UTF-8 sequence of characters
+            Pfrequency as a 4 byte big-endian integer value
+            length(certificateId)
+            certificateId as a hex-decoded sequence of bytes
+            timestamp as an 8 byte big-endian integer value
+            length(localRandomValue)
+            localRandomValue as a hex-decoded sequence of bytes
+            length(external/sourceId)
+            external/sourceId as a hex-decoded sequence of bytes
+            external/statusCode as a 4 byte big-endian integer value
+            length(external/value)
+            external/value as a hex-decoded sequence of bytes
+            length(listValue[@type=’previous’])
+            listValue[@type=’previous’] as a hex-decoded sequence of bytes
+            length(listValue[@type=’hour’])
+            listValue[@type=’hour’] as a hex-decoded sequence of bytes
+            length(listValue[@type=’day’])
+            listValue[@type=’day’] as a hex-decoded sequence of bytes
+            length(listValue[@type=’month’])
+            listValue[@type=’month’] as a hex-decoded sequence of bytes
+            length(listValue[@type=’year’])
+            listValue[@type=’year’] as a hex-decoded sequence of bytes
+            length(precommitmentValue)
+            precommitmentValue as a hex-decoded sequence of bytes
+            statusCode as a 4 byte big-endian integer value
+
+            where strlen(x) returns the number of characters in the string, x
+            where length(x) returns the number of bytes after x has been hex decoded
+
+            Different listValue types may be used, but if provided, they must be included in the hash in the order they are provided.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:maxLength value="8192"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="outputValue" type="sha512HexString">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-US">A 64 byte hex string of the SHA-512 hash of the concatenation of the input into the signatureValue and the hex decoded signature as a sequence of bytes</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- the chain type -->
+  <xs:complexType name="chainType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-US">A type for a sequence of pulses.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="pulse" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="pulseType">
+              <xs:attribute name="type" type="xs:token" use="optional">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-US">the type of list value. see documentation in pulseType for more information.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="sha512HexString">
+      <xs:restriction base="xs:token">
+        <xs:length value="128"/>
+        <xs:pattern value="([0-9]|[a-f]|[A-F])*" />
+      </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
