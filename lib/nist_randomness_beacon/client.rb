@@ -2,9 +2,9 @@ require 'httparty'
 require 'json'
 
 module NISTRandomnessBeacon
-  # Client to the Randomness Beacon API
+  # Client to the NIST Randomness Beacon API
   class Client
-    DEFAULT_URI = 'https://beacon.nist.gov/rest/record'.freeze
+    DEFAULT_URI = 'https://beacon.nist.gov/beacon/1.0/pulse'.freeze
 
     include HTTParty
     attr_reader :timestamp, :uri
@@ -14,8 +14,8 @@ module NISTRandomnessBeacon
       @uri = uri
     end
 
-    # Returns the Current Record (or next closest)
-    # https://beacon.nist.gov/rest/record/<timestamp>
+    # Returns the Current Record (or next closest AFTER the timestamp)
+    # https://<server name>/<context>/beacon/1.0/pulse/<timestamp>
     #
     def current
       response = self.class.get("#@uri/#@timestamp")
@@ -23,7 +23,7 @@ module NISTRandomnessBeacon
     end
 
     # Returns the Previous Record
-    # https://beacon.nist.gov/rest/record/previous/<timestamp>
+    # https://<server name>/<context>/beacon/1.0/pulse/previous/<timestamp>
     #
     def previous
       response = self.class.get("#@uri/previous/#@timestamp")
@@ -31,7 +31,7 @@ module NISTRandomnessBeacon
     end
 
     # Returns the Next Record
-    # https://beacon.nist.gov/rest/record/next/<timestamp>
+    #  https://<server name>/<context>/beacon/1.0/pulse/next/<timestamp>
     #
     def next
       response = self.class.get("#@uri/next/#@timestamp")
@@ -39,7 +39,7 @@ module NISTRandomnessBeacon
     end
 
     # Returns the Last Record
-    # https://beacon.nist.gov/rest/record/last
+    # https://<server name>/<context>/beacon/1.0/pulse/last
     #
     def last
       response = self.class.get("#@uri/last")
@@ -47,7 +47,7 @@ module NISTRandomnessBeacon
     end
 
     # Returns the Start Chain Record
-    # https://beacon.nist.gov/rest/record/start-chain/<timestamp>
+    # https://<server name>/<context>/beacon/1.0/pulse/start-chain/<timestamp>
     #
     def start_chain
       response = self.class.get("#@uri/start-chain/#@timestamp")
@@ -58,7 +58,7 @@ module NISTRandomnessBeacon
 
     def create_new_record(response, response_code=200)
       raise ServiceError, response.body unless response.code.eql? response_code
-      NISTRandomnessBeacon::Record.new(response.parsed_response['record'])
+      NISTRandomnessBeacon::Record.new(response.parsed_response['pulse'])
     end
   end
 end

@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe NISTRandomnessBeacon::Client do
   before do
-    Timecop.freeze(Time.utc(2014))
+    Timecop.freeze(Time.utc(2018))
   end
 
   after do
@@ -13,7 +13,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'current' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('current') do
+        VCR.use_cassette('current_v2') do
           NISTRandomnessBeacon::Client.new.current
         end
       }
@@ -38,8 +38,9 @@ describe NISTRandomnessBeacon::Client do
   describe 'previous' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('previous') do
-          NISTRandomnessBeacon::Client.new.previous
+        VCR.use_cassette('previous_v2') do
+          # NOTE(chaserx): using frozen time above results in 404; this magic number works though
+          NISTRandomnessBeacon::Client.new(1517179800000).previous
         end
       }
 
@@ -63,7 +64,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'next' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('next') do
+        VCR.use_cassette('next_v2') do
           NISTRandomnessBeacon::Client.new.next
         end
       }
@@ -88,7 +89,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'last' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('last') do
+        VCR.use_cassette('last_v2') do
           NISTRandomnessBeacon::Client.new.last
         end
       }
@@ -113,8 +114,9 @@ describe NISTRandomnessBeacon::Client do
   describe 'start chain' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('start_chain') do
-          NISTRandomnessBeacon::Client.new.start_chain
+        VCR.use_cassette('start_chain_v2') do
+          # NOTE(chaserx): using frozen time above results in 404; this magic number works though
+          NISTRandomnessBeacon::Client.new(1517179800000).start_chain
         end
       }
 
