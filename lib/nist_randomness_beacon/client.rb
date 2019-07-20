@@ -3,8 +3,11 @@ require 'json'
 
 module NISTRandomnessBeacon
   # Client to the NIST Randomness Beacon API
+  # Certificate
+  #   https://beacon.nist.gov/beacon/2.0/certificate/<certificateIdentifier>
+  #
   class Client
-    DEFAULT_URI = 'https://beacon.nist.gov/beacon/1.0/pulse'.freeze
+    DEFAULT_URI = 'https://beacon.nist.gov/beacon/2.0'.freeze
 
     include HTTParty
     attr_reader :timestamp, :uri
@@ -15,42 +18,51 @@ module NISTRandomnessBeacon
     end
 
     # Returns the Current Record (or next closest AFTER the timestamp)
-    # https://<server name>/<context>/beacon/1.0/pulse/<timestamp>
+    # https://<default uri>/pulse/time/<timestamp>
     #
     def current
-      response = self.class.get("#@uri/#@timestamp")
+      response = self.class.get("#@uri/pulse/time/#@timestamp")
       create_new_record(response)
     end
 
     # Returns the Previous Record
-    # https://<server name>/<context>/beacon/1.0/pulse/previous/<timestamp>
+    # https://<default uri>/pulse/time/previous/<timestamp>
     #
     def previous
-      response = self.class.get("#@uri/previous/#@timestamp")
+      response = self.class.get("#@uri/pulse/time/previous/#@timestamp")
       create_new_record(response)
     end
 
     # Returns the Next Record
-    #  https://<server name>/<context>/beacon/1.0/pulse/next/<timestamp>
+    #  https://<default uri>/pulse/time/next/<timestamp>
     #
     def next
-      response = self.class.get("#@uri/next/#@timestamp")
+      response = self.class.get("#@uri/pulse/time/next/#@timestamp")
       create_new_record(response)
     end
 
     # Returns the Last Record
-    # https://<server name>/<context>/beacon/1.0/pulse/last
+    # https://<default uri>/pulse/last
+    # https://<default uri>/beacon/2.0/chain/last/pulse/last
     #
     def last
-      response = self.class.get("#@uri/last")
+      response = self.class.get("#@uri/pulse/last")
       create_new_record(response)
     end
 
     # Returns the Start Chain Record
-    # https://<server name>/<context>/beacon/1.0/pulse/start-chain/<timestamp>
+    # https://beacon.nist.gov/beacon/2.0/chain/1/pulse/1
     #
-    def start_chain
-      response = self.class.get("#@uri/start-chain/#@timestamp")
+    def start_chain()
+      response = self.class.get("#@uri/chain/1/pulse/1")
+      create_new_record(response)
+    end
+
+    # Returns a Specific Pulse in a Specific Chain
+    # required arguments: a chain_index and a pulse_index both integers
+    #
+    def pulse_in_chain(chain_index:1, pulse_index:1)
+      response = self.class.get("#@uri/chain/#{chain_index}/pulse/#{pulse_index}")
       create_new_record(response)
     end
 

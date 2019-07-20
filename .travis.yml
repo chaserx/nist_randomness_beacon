@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.5.0
-  - 2.4.0
-  - 2.3.0
+  - 2.6.2
+  - 2.5.5
+  - 2.4.5
 script: bundle exec rspec spec

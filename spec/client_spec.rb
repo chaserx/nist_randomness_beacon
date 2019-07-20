@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe NISTRandomnessBeacon::Client do
   before do
-    Timecop.freeze(Time.utc(2018))
+    Timecop.freeze(Time.utc(2019, 4, 1))
   end
 
   after do
@@ -13,7 +13,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'current' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('current_v2') do
+        VCR.use_cassette('current_beacon_v2') do
           NISTRandomnessBeacon::Client.new.current
         end
       }
@@ -38,9 +38,9 @@ describe NISTRandomnessBeacon::Client do
   describe 'previous' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('previous_v2') do
+        VCR.use_cassette('previous_beacon_v2') do
           # NOTE(chaserx): using frozen time above results in 404; this magic number works though
-          NISTRandomnessBeacon::Client.new(1517179800000).previous
+          NISTRandomnessBeacon::Client.new.previous
         end
       }
 
@@ -64,7 +64,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'next' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('next_v2') do
+        VCR.use_cassette('next_beacon_v2') do
           NISTRandomnessBeacon::Client.new.next
         end
       }
@@ -89,7 +89,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'last' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('last_v2') do
+        VCR.use_cassette('last_beacon_v2') do
           NISTRandomnessBeacon::Client.new.last
         end
       }
@@ -114,7 +114,7 @@ describe NISTRandomnessBeacon::Client do
   describe 'start chain' do
     context 'successful response' do
       subject {
-        VCR.use_cassette('start_chain_v2') do
+        VCR.use_cassette('start_chain_beacon_v2') do
           # NOTE(chaserx): using frozen time above results in 404; this magic number works though
           NISTRandomnessBeacon::Client.new(1517179800000).start_chain
         end
@@ -128,6 +128,31 @@ describe NISTRandomnessBeacon::Client do
     context 'problematic response' do
       subject {
         NISTRandomnessBeacon::Client.new.start_chain
+      }
+
+      it 'raises service error' do
+        stub_request(:get, /.*beacon.nist.gov*./).to_return(status: 500, body: 'stubbed response')
+        expect{subject}.to raise_error(NISTRandomnessBeacon::ServiceError, 'stubbed response')
+      end
+    end
+  end
+
+  describe 'pulse_in_chain' do
+    context 'successful response' do
+      subject {
+        VCR.use_cassette('pulse_in_chain_beacon_v2') do
+          NISTRandomnessBeacon::Client.new.pulse_in_chain(chain_index: 1, pulse_index: 1)
+        end
+      }
+
+      it 'returns a record object' do
+        expect(subject).to be_an_instance_of(NISTRandomnessBeacon::Record)
+      end
+    end
+
+    context 'problematic response' do
+      subject {
+        NISTRandomnessBeacon::Client.new.pulse_in_chain(chain_index: 42, pulse_index: 42)
       }
 
       it 'raises service error' do
